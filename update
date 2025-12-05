@@ -1,0 +1,34 @@
+#### File 2: `.github/workflows/update-clock.yml`
+```yaml
+name: Update Clock Every Minute
+
+on:
+  workflow_dispatch:      # Allows manual trigger
+  schedule:
+    - cron: '*/1 * * * *' # Every minute
+
+jobs:
+  update-clock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Pillow
+        run: pip install pillow
+
+      - name: Generate new clock
+        run: python generate_clock.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "Automated Clock"
+          git config user.email "actions@github.com"
+          git add clock.png
+          git diff --quiet && exit 0
+          git commit -m "Update clock $(date -u)"
+          git push
