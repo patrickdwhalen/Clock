@@ -1,0 +1,34 @@
+#### File 1: `generate_clock.py`
+```python
+from PIL import Image, ImageDraw, ImageFont
+from datetime import datetime
+import textwrap
+
+# Settings - change these to whatever you like
+width, height = 800, 200
+bg_color = (0, 0, 0)          # Black
+text_color = (0, 255, 100)    # Matrix green
+font_size = 120
+time_format = "%H:%M"         # 24h. Use "%I:%M %p" for 12h
+
+# Create image
+img = Image.new('RGB', (width, height), bg_color)
+draw = ImageDraw.Draw(img)
+
+# Try to use a nice font, fall back to default
+try:
+    font = ImageFont.truetype("arial.ttf", font_size)
+except:
+    font = ImageFont.load_default()
+
+time_text = datetime.utcnow().strftime(time_format)  # UTC so it's consistent worldwide
+
+# Center text
+bbox = draw.textbbox((0, 0), time_text, font=font)
+w = bbox[2] - bbox[0]
+h = bbox[3] - bbox[1]
+position = ((width-w)/2, (height-h)/2)
+
+draw.text(position, time_text, font=font, fill=text_color)
+
+img.save("clock.png")
